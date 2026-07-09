@@ -1,11 +1,9 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { logAdminActivity } from "@/lib/admin/logs";
 import { requireAdminActionContext } from "@/lib/admin/permissions";
-import { buildMusicStoragePath, STORAGE_BUCKETS, validateStorageFile } from "@/lib/storage";
 import type { Database, Json } from "@/lib/types";
 
 type MusicTrackRow = Database["public"]["Tables"]["music_tracks"]["Row"];
@@ -27,25 +25,6 @@ function formText(formData: FormData, key: string) {
 
 function formBoolean(formData: FormData, key: string) {
   return formData.get(key) === "on";
-}
-
-function assertMusicFile(value: FormDataEntryValue | null): File {
-  if (!(value instanceof File) || value.size === 0) {
-    throw new Error("Choose an audio file before saving the music track.");
-  }
-
-  const validation = validateStorageFile("music", { size: value.size, type: value.type });
-
-  if (!validation.valid) {
-    throw new Error(validation.reason ?? "The selected music file is not allowed.");
-  }
-
-  const extension = value.name.split(".").pop()?.toLowerCase();
-  if (!extension || !["mp3", "m4a", "wav", "webm"].includes(extension)) {
-    throw new Error("Unsupported file extension. Use mp3, m4a, wav, or webm.");
-  }
-
-  return value;
 }
 
 async function deactivateOtherTracks(
@@ -70,57 +49,6 @@ function revalidateMusicPaths() {
   revalidatePath("/archive/open-when");
   revalidatePath("/archive/from-me");
   revalidatePath("/archive/favourites");
-}
-
-export async function uploadMusicTrack(formData: FormData) {
-  const title = titleSchema.parse(formData.get("title"));
-  const description = descriptionSchema.parse(formData.get("description"));
-  const defaultVolume = volumeSchema.parse(formData.get("defaultVolume") || 0.25);
-  const isActive = formBoolean(formData, "isActive");
-  const file = assertMusicFile(formData.get("file"));
-  const { profile, serviceClient } = await requireAdminActionContext();
-  const trackId = randomUUID();
-  const storagePath = buildMusicStoragePath({ trackId, fileName: file.name });
-
-  const { error: uploadError } = await serviceClient.storage
-    .from(STORAGE_BUCKETS.music)
-    .upload(storagePath, file, {
-      contentType: file.type,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    throw new Error(uploadError.message);
-  }
-
-  if (isActive) {
-    await deactivateOtherTracks(serviceClient);
-  }
-
-  const { error: insertError } = await serviceClient.from("music_tracks").insert({
-    id: trackId,
-    title,
-    description,
-    bucket: STORAGE_BUCKETS.music,
-    storage_path: storagePath,
-    is_active: isActive,
-    default_volume: defaultVolume,
-  });
-
-  if (insertError) {
-    await serviceClient.storage.from(STORAGE_BUCKETS.music).remove([storagePath]);
-    throw new Error(insertError.message);
-  }
-
-  await logAdminActivity(serviceClient, {
-    adminId: profile.id,
-    action: "upload_music_track",
-    targetTable: "music_tracks",
-    targetId: trackId,
-    metadata: { title, isActive, defaultVolume } satisfies Json,
-  });
-
-  revalidateMusicPaths();
 }
 
 export async function updateMusicTrack(formData: FormData) {

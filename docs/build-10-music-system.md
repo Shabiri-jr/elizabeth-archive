@@ -21,6 +21,45 @@ Admin can:
 
 Only upload music you own, created yourself, or have permission to use.
 
+Music files are not sent through a Next.js Server Action. The admin browser asks the app for a signed Supabase upload token, uploads the file directly to private Supabase Storage, then sends a small JSON request to create the `music_tracks` row.
+
+## Upload Flow
+
+The direct upload flow uses two small admin-only API routes:
+
+```text
+/api/admin/music/create-upload-url
+/api/admin/music/create-track
+```
+
+`create-upload-url` accepts small JSON only:
+
+- filename
+- content type
+- file size
+- title
+- optional description
+- optional default volume
+
+It verifies the current user is an admin, validates file type/size, generates a path such as:
+
+```text
+music/{timestamp}-{random}.{ext}
+```
+
+Then it returns the private bucket name, storage path, signed upload URL, and token.
+
+`create-track` accepts only metadata JSON after the browser upload succeeds:
+
+- title
+- description
+- bucket
+- storage path
+- default volume
+- active status
+
+It verifies admin access again, checks the uploaded object exists, deactivates other tracks when needed, and inserts the `music_tracks` row.
+
 ## Database Migration
 
 Run this migration on an existing Supabase project:
@@ -60,7 +99,7 @@ Maximum size:
 25MB
 ```
 
-Music files are stored in private Supabase Storage. The archive receives a short-lived signed URL generated server-side.
+Music files are stored in private Supabase Storage. The archive receives a short-lived signed playback URL generated server-side.
 
 ## Elizabeth Experience
 
@@ -111,6 +150,7 @@ Playback can continue smoothly while navigating between archive subroutes becaus
 - [ ] Run `supabase/build-10-music-system.sql`.
 - [ ] Open `/admin/music` as admin.
 - [ ] Upload an mp3, m4a, wav, or webm under 25MB.
+- [ ] Confirm the upload does not trigger a Next.js Server Action body-size error.
 - [ ] Set the uploaded track active.
 - [ ] Preview audio from the admin page.
 - [ ] Enable the music prompt.

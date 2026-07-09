@@ -175,6 +175,7 @@ Build 10 adds:
 
 - `/admin/music` for uploading and managing the active background track
 - private `elizabeth-music` storage for mp3, m4a, wav, and webm files
+- direct browser-to-Supabase music uploads using signed upload URLs
 - an opt-in music permission prompt inside the archive
 - a floating archive music player with play/pause, mute, volume, and track name
 - local, non-sensitive preferences for music choice, volume, and muted state
