@@ -24,6 +24,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  serverActions: {
+    bodySizeLimit: "200mb",
+  },
   async headers() {
     return [
       {
