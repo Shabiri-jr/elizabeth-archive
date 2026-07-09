@@ -137,7 +137,11 @@ export function ArchiveExperience({ data, access, favouriteKeys }: ArchiveExperi
   return (
     <ArchiveInteractionsProvider initialFavouriteKeys={favouriteKeys}>
       <ArchiveRevealClient revealModeEnabled={Boolean(data.settings?.reveal_mode_enabled)} />
-      <ArchiveHero isAdminPreview={access.isAdminPreview} settings={data.settings ?? access.settings} heroImage={data.images[0]} />
+      <ArchiveHero
+        isAdminPreview={access.isAdminPreview}
+        heroImage={data.images[0]}
+        signatureWords={data.words}
+      />
       <div className="mx-auto -mt-12 flex max-w-6xl justify-center px-4 pb-8 sm:justify-end">
         <ReplayTrailerButton />
       </div>

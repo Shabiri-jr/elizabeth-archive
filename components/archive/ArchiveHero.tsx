@@ -1,19 +1,16 @@
 /* eslint-disable @next/next/no-img-element -- Archive media uses short-lived signed Supabase URLs. */
 import { ArrowDown, Eye, LockKeyhole } from "lucide-react";
 import { closeElizabethArchive } from "@/app/archive/actions";
-import { formatBirthdayDate } from "@/lib/archive/formatters";
+import { ElizabethSignatureScene } from "@/components/archive/ElizabethSignatureScene";
 import type { ArchiveMedia } from "@/lib/archive/queries";
-import type { Database } from "@/lib/types";
-
-type SettingsRow = Database["public"]["Tables"]["archive_settings"]["Row"];
 
 type ArchiveHeroProps = {
   isAdminPreview: boolean;
-  settings: SettingsRow | null;
   heroImage?: ArchiveMedia;
+  signatureWords?: string[];
 };
 
-export function ArchiveHero({ isAdminPreview, settings, heroImage }: ArchiveHeroProps) {
+export function ArchiveHero({ isAdminPreview, heroImage, signatureWords = [] }: ArchiveHeroProps) {
   return (
     <section
       id="opening-prelude"
@@ -94,35 +91,7 @@ export function ArchiveHero({ isAdminPreview, settings, heroImage }: ArchiveHero
               </div>
             </div>
 
-            <div data-archive-hero-item className="relative hidden items-end p-10 lg:flex">
-              <div className="w-full rotate-2 rounded-[1.8rem] bg-porcelain p-3 shadow-[var(--shadow-beautiful-lg)]">
-                <div
-                  data-parallax-soft
-                  className="aspect-[4/5] overflow-hidden rounded-[1.25rem] border border-lilac-border/45 bg-gradient-to-br from-pale-lilac via-porcelain to-champagne/20"
-                >
-                  {heroImage?.url ? (
-                    <img
-                      src={heroImage.url}
-                      alt={heroImage.caption ?? "An approved keepsake from the archive"}
-                      width={1200}
-                      height={1500}
-                      decoding="async"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-                      <p className="font-serif text-4xl leading-none text-espresso">19 August</p>
-                      <p className="mt-4 text-sm uppercase tracking-[0.2em] text-espresso/44">
-                        The story opens here
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <p className="px-2 pb-1 pt-3 text-sm leading-6 text-espresso/58">
-                  {formatBirthdayDate(settings?.birthday_date)} / handled with care.
-                </p>
-              </div>
-            </div>
+            <ElizabethSignatureScene words={signatureWords} heroImage={heroImage} />
           </div>
         </div>
       </div>
