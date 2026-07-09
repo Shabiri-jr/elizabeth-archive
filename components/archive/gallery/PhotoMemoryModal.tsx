@@ -1,7 +1,8 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- Archive images use short-lived signed Supabase URLs. */
-import { useCallback, useEffect, useRef, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { FavouriteButton } from "@/components/archive/FavouriteButton";
 import type { EmotionalGalleryImage } from "@/lib/archive/gallery";
@@ -14,10 +15,15 @@ type PhotoMemoryModalProps = {
   onNext: () => void;
 };
 
+const subscribeToPortalTarget = () => () => {};
+const getPortalTarget = () => document.body;
+const getServerPortalTarget = () => null;
+
 export function PhotoMemoryModal({ images, activeIndex, onClose, onPrevious, onNext }: PhotoMemoryModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const lastFocusedElement = useRef<HTMLElement | null>(null);
+  const portalTarget = useSyncExternalStore(subscribeToPortalTarget, getPortalTarget, getServerPortalTarget);
   const activeImage = activeIndex === null ? null : images[activeIndex] ?? null;
   const titleId = activeImage ? `gallery-photo-title-${activeImage.id}` : "gallery-photo-title";
 
@@ -85,9 +91,9 @@ export function PhotoMemoryModal({ images, activeIndex, onClose, onPrevious, onN
     [onClose],
   );
 
-  if (!activeImage) return null;
+  if (!activeImage || !portalTarget) return null;
 
-  return (
+  return createPortal(
     <div
       ref={dialogRef}
       role="dialog"
@@ -176,6 +182,7 @@ export function PhotoMemoryModal({ images, activeIndex, onClose, onPrevious, onN
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    portalTarget,
   );
 }

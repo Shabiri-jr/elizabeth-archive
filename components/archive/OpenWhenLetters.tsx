@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { BookOpen, X } from "lucide-react";
 import { ArchiveEmptyState } from "@/components/archive/ArchiveEmptyState";
 import { FavouriteButton } from "@/components/archive/FavouriteButton";
@@ -10,8 +11,13 @@ type OpenWhenLettersProps = {
   letters: OpenWhenLetter[];
 };
 
+const subscribeToPortalTarget = () => () => {};
+const getPortalTarget = () => document.body;
+const getServerPortalTarget = () => null;
+
 export function OpenWhenLetters({ letters }: OpenWhenLettersProps) {
   const [activeLetter, setActiveLetter] = useState<OpenWhenLetter | null>(null);
+  const portalTarget = useSyncExternalStore(subscribeToPortalTarget, getPortalTarget, getServerPortalTarget);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const lastFocusedElement = useRef<HTMLElement | null>(null);
 
@@ -89,16 +95,17 @@ export function OpenWhenLetters({ letters }: OpenWhenLettersProps) {
         ))}
       </div>
 
-      {activeLetter ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="open-when-dialog-title"
-          className="fixed inset-0 z-40 flex items-center justify-center bg-warm-black/68 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeLetter();
-          }}
-        >
+      {activeLetter && portalTarget
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="open-when-dialog-title"
+              className="fixed inset-0 z-40 flex items-center justify-center bg-warm-black/68 p-4"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) closeLetter();
+              }}
+            >
           <article className="relative max-h-[88svh] w-full max-w-3xl overflow-y-auto rounded-[2rem] bg-warm-black/[0.035] p-1.5 shadow-[var(--shadow-beautiful-lg)] ring-1 ring-porcelain/18">
             <div className="rounded-[calc(2rem-0.375rem)] border border-lilac-border/70 bg-porcelain p-6 sm:p-9">
               <button
@@ -123,8 +130,10 @@ export function OpenWhenLetters({ letters }: OpenWhenLettersProps) {
               </div>
             </div>
           </article>
-        </div>
-      ) : null}
+            </div>,
+            portalTarget,
+          )
+        : null}
     </>
   );
 }

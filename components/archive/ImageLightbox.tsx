@@ -1,7 +1,8 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- Archive media uses short-lived signed Supabase URLs. */
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { FavouriteButton } from "@/components/archive/FavouriteButton";
 import type { ArchiveMedia } from "@/lib/archive/queries";
@@ -10,8 +11,13 @@ type ImageLightboxProps = {
   images: ArchiveMedia[];
 };
 
+const subscribeToPortalTarget = () => () => {};
+const getPortalTarget = () => document.body;
+const getServerPortalTarget = () => null;
+
 export function ImageLightbox({ images }: ImageLightboxProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const portalTarget = useSyncExternalStore(subscribeToPortalTarget, getPortalTarget, getServerPortalTarget);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const lastFocusedElement = useRef<HTMLElement | null>(null);
@@ -134,17 +140,18 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
         ))}
       </div>
 
-      {activeImage ? (
-        <div
-          ref={dialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={titleId}
-          className="fixed inset-0 z-40 flex items-center justify-center bg-warm-black/72 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeImage();
-          }}
-        >
+      {activeImage && portalTarget
+        ? createPortal(
+            <div
+              ref={dialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
+              className="fixed inset-0 z-40 flex items-center justify-center bg-warm-black/72 p-4"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) closeImage();
+              }}
+            >
           <div className="relative w-full max-w-5xl rounded-[2rem] bg-porcelain p-3 shadow-[var(--shadow-beautiful-lg)]">
             <button
               ref={closeButtonRef}
@@ -208,8 +215,10 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
               </div>
             ) : null}
           </div>
-        </div>
-      ) : null}
+            </div>,
+            portalTarget,
+          )
+        : null}
     </>
   );
 }
