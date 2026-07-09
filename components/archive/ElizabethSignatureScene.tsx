@@ -116,10 +116,7 @@ export function ElizabethSignatureScene({ words, heroImage }: ElizabethSignature
             <p className="rounded-full border border-champagne/36 bg-ivory/62 px-4 py-2 text-[0.65rem] font-bold uppercase tracking-[0.24em] text-espresso/48 shadow-[var(--shadow-beautiful-sm)]">
               Private showing
             </p>
-            <h2 className="mt-7 font-script text-[clamp(5rem,9vw,9rem)] leading-none text-deep-lilac drop-shadow-[0_18px_28px_rgba(123,95,163,0.18)]">
-              Elizabeth
-            </h2>
-            <p className="mt-5 max-w-xs text-sm leading-7 text-espresso/58 sm:max-w-sm">
+            <p className="mt-7 max-w-xs text-sm leading-7 text-espresso/58 sm:max-w-sm">
               A little movie of the words people keep reaching for when they think of you.
             </p>
           </div>
