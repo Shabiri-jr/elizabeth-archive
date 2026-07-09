@@ -393,7 +393,7 @@ insert into public.archive_settings (
   music_prompt_enabled,
   maintenance_mode
 )
-values ('11111111-1111-1111-1111-111111111111', '2026-08-19', false, true, false, false, true, false)
+values ('00000000-0000-0000-0000-000000000000', '2026-08-19', false, true, false, false, true, false)
 on conflict (id) do update set
   birthday_date = excluded.birthday_date,
   archive_live = excluded.archive_live,

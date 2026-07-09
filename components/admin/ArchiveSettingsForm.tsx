@@ -11,7 +11,7 @@ type ArchiveSettingsFormProps = {
 
 function fallbackSettings(): SettingsRow {
   return {
-    id: "11111111-1111-1111-1111-111111111111",
+    id: "00000000-0000-0000-0000-000000000000",
     birthday_date: "2026-08-19",
     archive_live: false,
     contributions_open: true,

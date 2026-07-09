@@ -515,7 +515,7 @@ export async function deleteOpenWhenLetter(formData: FormData) {
 }
 
 export async function updateArchiveSettings(formData: FormData) {
-  const settingsId = formText(formData, "settingsId") || "11111111-1111-1111-1111-111111111111";
+  const settingsId = formText(formData, "settingsId") || "00000000-0000-0000-0000-000000000000";
   const birthdayDate = z.string().trim().min(1).parse(formData.get("birthdayDate"));
   const { profile, serviceClient } = await requireAdminActionContext();
   const settings = {
