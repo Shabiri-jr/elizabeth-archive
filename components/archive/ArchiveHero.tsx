@@ -36,6 +36,12 @@ export function ArchiveHero({ isAdminPreview, heroImage, signatureWords = [] }: 
               className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,250,243,0.96),rgba(255,250,243,0.86)_42%,rgba(241,232,250,0.58)),radial-gradient(circle_at_82%_18%,rgba(191,162,219,0.28),transparent_32%),radial-gradient(circle_at_18%_88%,rgba(216,180,106,0.18),transparent_36%)]"
             />
 
+            <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-6 lg:pr-48">
+              <p className="font-script text-[clamp(4rem,14vw,10rem)] leading-none text-deep-lilac drop-shadow-[0_18px_28px_rgba(123,95,163,0.18)]">
+                Who Knows?
+              </p>
+            </div>
+
             <div className="relative flex flex-col justify-between gap-12 p-7 sm:p-10 lg:p-14">
               <div data-archive-hero-item className="flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-2 rounded-full border border-lilac-border/70 bg-pale-lilac/78 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-deep-lilac shadow-[var(--shadow-beautiful-sm)]">
