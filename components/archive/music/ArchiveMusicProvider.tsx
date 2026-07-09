@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Music2, Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { Music2 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { ArchiveMusicPlayer } from "@/components/archive/music/ArchiveMusicPlayer";
 import type { ArchiveMusicTrack } from "@/lib/music";
 
 type ArchiveMusicProviderProps = {
@@ -217,57 +217,16 @@ export function ArchiveMusicProvider({ track, children }: ArchiveMusicProviderPr
       ) : null}
 
       {track && musicRoute && hydrated ? (
-        <aside className="fixed bottom-3 left-3 right-3 z-40 rounded-[1.6rem] border border-lilac-border/70 bg-ivory/92 p-3 shadow-[var(--shadow-beautiful-lg)] backdrop-blur-xl print-hide sm:bottom-5 sm:left-auto sm:right-5 sm:w-[22rem]">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={togglePlayback}
-              className="flex size-11 shrink-0 items-center justify-center rounded-full bg-deep-lilac text-ivory shadow-[var(--shadow-beautiful-sm)] transition-[background,transform] duration-300 hover:-translate-y-0.5 hover:bg-[#6c5392] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-deep-lilac/45"
-              aria-label={isPlaying ? "Pause background music" : "Play background music"}
-            >
-              {isPlaying ? <Pause aria-hidden="true" className="size-4" /> : <Play aria-hidden="true" className="size-4" />}
-            </button>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-bold uppercase tracking-[0.16em] text-deep-lilac/72">
-                Background music
-              </p>
-              <p className="truncate text-sm font-bold text-espresso">{track.title}</p>
-              {track.description ? <p className="truncate text-xs text-espresso/48">{track.description}</p> : null}
-            </div>
-            <button
-              type="button"
-              onClick={toggleMuted}
-              className={cn(
-                "flex size-10 shrink-0 items-center justify-center rounded-full border shadow-[var(--shadow-beautiful-sm)] transition-[background,transform,color] duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-deep-lilac/45",
-                muted
-                  ? "border-lilac-border bg-pale-lilac text-deep-lilac"
-                  : "border-espresso/10 bg-porcelain text-espresso/60",
-              )}
-              aria-label={muted ? "Unmute background music" : "Mute background music"}
-              aria-pressed={muted}
-            >
-              {muted ? <VolumeX aria-hidden="true" className="size-4" /> : <Volume2 aria-hidden="true" className="size-4" />}
-            </button>
-          </div>
-          <label className="mt-3 grid grid-cols-[auto_1fr_auto] items-center gap-3 text-xs font-bold uppercase tracking-[0.14em] text-espresso/46">
-            <span>Volume</span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={(event) => updateVolume(Number(event.target.value))}
-              className="accent-deep-lilac"
-              aria-label="Background music volume"
-            />
-            <span>{Math.round(volume * 100)}%</span>
-          </label>
-          <p className="sr-only" aria-live="polite">
-            {playbackMessage}
-          </p>
-          {playbackMessage ? <p className="mt-2 text-xs leading-5 text-espresso/52">{playbackMessage}</p> : null}
-        </aside>
+        <ArchiveMusicPlayer
+          track={track}
+          isPlaying={isPlaying}
+          volume={volume}
+          muted={muted}
+          playbackMessage={playbackMessage}
+          onTogglePlayback={togglePlayback}
+          onToggleMuted={toggleMuted}
+          onVolumeChange={updateVolume}
+        />
       ) : null}
     </>
   );
